@@ -1,0 +1,2782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet & Logistics Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #f8f9fa;
+            --accent-color: #34a853;
+            --danger-color: #ea4335;
+            --warning-color: #fbbc04;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+        }
+        
+        .sidebar {
+            background-color: white;
+            min-height: calc(100vh - 56px);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            padding-top: 20px;
+        }
+        
+        .sidebar .nav-link {
+            color: #555;
+            padding: 12px 20px;
+            margin-bottom: 5px;
+            border-radius: 0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: #f1f3f5;
+            color: var(--primary-color);
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: #e8f0fe;
+            color: var(--primary-color);
+            font-weight: 500;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .stat-card {
+            border-left: 4px solid;
+            padding: 15px;
+        }
+        
+        .stat-card.primary {
+            border-left-color: var(--primary-color);
+        }
+        
+        .stat-card.success {
+            border-left-color: var(--accent-color);
+        }
+        
+        .stat-card.warning {
+            border-left-color: var(--warning-color);
+        }
+        
+        .stat-card.danger {
+            border-left-color: var(--danger-color);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1765cc;
+            border-color: #1765cc;
+        }
+        
+        .map-container {
+            height: 400px;
+            background-color: #e8f0fe;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .truck-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .truck-marker:hover {
+            transform: scale(1.2);
+        }
+        
+        .truck-info-popup {
+            position: absolute;
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 200px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .status-badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        
+        .status-active {
+            background-color: #e6f4ea;
+            color: var(--accent-color);
+        }
+        
+        .status-inactive {
+            background-color: #fce8e6;
+            color: var(--danger-color);
+        }
+        
+        .status-maintenance {
+            background-color: #fef7e0;
+            color: var(--warning-color);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(26, 115, 232, 0.25);
+        }
+        
+        .mobile-nav {
+            display: none;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .mobile-nav .nav-link {
+            color: #555;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+        
+        .mobile-nav .nav-link.active {
+            background-color: #e8f0fe;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .mobile-nav {
+                display: block;
+            }
+            
+            .main-content {
+                padding: 10px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+            
+            .map-container {
+                height: 250px;
+            }
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .filter-section {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .progress {
+            height: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-truck me-2"></i>Fleet Management System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar for desktop -->
+            <div class="col-md-2 d-none d-md-block sidebar">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-tab="dashboard">
+                            <i class="bi bi-speedometer2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="tracking">
+                            <i class="bi bi-geo-alt"></i>Truck Tracking
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="drivers">
+                            <i class="bi bi-person-badge"></i>Driver Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="diesel">
+                            <i class="bi bi-fuel-pump"></i>Diesel Logs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="maintenance">
+                            <i class="bi bi-tools"></i>Maintenance
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="delivery">
+                            <i class="bi bi-box-seam"></i>Delivery Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="trips">
+                            <i class="bi bi-calendar-check"></i>Trip Logs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="reports">
+                            <i class="bi bi-file-earmark-bar-graph"></i>Reports
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Mobile navigation -->
+            <div class="col-12 mobile-nav">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-tab="dashboard">
+                            <i class="bi bi-speedometer2"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="tracking">
+                            <i class="bi bi-geo-alt"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="drivers">
+                            <i class="bi bi-person-badge"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="diesel">
+                            <i class="bi bi-fuel-pump"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="maintenance">
+                            <i class="bi bi-tools"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="delivery">
+                            <i class="bi bi-box-seam"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="trips">
+                            <i class="bi bi-calendar-check"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-tab="reports">
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-10 main-content">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <h2 class="mb-4">Dashboard</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card primary">
+                                <div class="card-body">
+                                    <div class="stat-label">Total Trucks</div>
+                                    <div class="stat-value">10</div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-primary" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card success">
+                                <div class="card-body">
+                                    <div class="stat-label">Active Trips</div>
+                                    <div class="stat-value">7</div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: 70%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card warning">
+                                <div class="card-body">
+                                    <div class="stat-label">Diesel Cost (Month)</div>
+                                    <div class="stat-value">$4,250</div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card danger">
+                                <div class="card-body">
+                                    <div class="stat-label">Maintenance Due</div>
+                                    <div class="stat-value">3</div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-danger" style="width: 30%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8 mb-4">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Truck Status Overview</span>
+                                    <button class="btn btn-sm btn-outline-primary">View All</button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Truck ID</th>
+                                                    <th>Driver</th>
+                                                    <th>Current Location</th>
+                                                    <th>Status</th>
+                                                    <th>Next Trip</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>GJ01AB1234</strong></td>
+                                                    <td>Rajesh Kumar</td>
+                                                    <td>Mumbai, Maharashtra</td>
+                                                    <td><span class="badge status-badge status-active">Active</span></td>
+                                                    <td>Today, 2:00 PM</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>GJ01AB1235</strong></td>
+                                                    <td>Amit Patel</td>
+                                                    <td>Delhi, NCR</td>
+                                                    <td><span class="badge status-badge status-active">Active</span></td>
+                                                    <td>Tomorrow, 9:00 AM</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>GJ01AB1236</strong></td>
+                                                    <td>Vikram Singh</td>
+                                                    <td>Ahmedabad, Gujarat</td>
+                                                    <td><span class="badge status-badge status-maintenance">Maintenance</span></td>
+                                                    <td>-</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>GJ01AB1237</strong></td>
+                                                    <td>Suresh Reddy</td>
+                                                    <td>Bangalore, Karnataka</td>
+                                                    <td><span class="badge status-badge status-active">Active</span></td>
+                                                    <td>Today, 5:00 PM</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>GJ01AB1238</strong></td>
+                                                    <td>Not Assigned</td>
+                                                    <td>Pune, Maharashtra</td>
+                                                    <td><span class="badge status-badge status-inactive">Inactive</span></td>
+                                                    <td>-</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-header">Recent Activities</div>
+                                <div class="card-body">
+                                    <div class="activity-list">
+                                        <div class="d-flex mb-3">
+                                            <div class="me-3">
+                                                <div class="bg-light rounded-circle p-2">
+                                                    <i class="bi bi-fuel-pump-fill text-primary"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Diesel filled</div>
+                                                <div class="text-muted small">GJ01AB1234 - 150 liters at Mumbai</div>
+                                                <div class="text-muted small">2 hours ago</div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex mb-3">
+                                            <div class="me-3">
+                                                <div class="bg-light rounded-circle p-2">
+                                                    <i class="bi bi-tools text-warning"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Maintenance completed</div>
+                                                <div class="text-muted small">GJ01AB1236 - Oil change</div>
+                                                <div class="text-muted small">5 hours ago</div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex mb-3">
+                                            <div class="me-3">
+                                                <div class="bg-light rounded-circle p-2">
+                                                    <i class="bi bi-box-seam-fill text-success"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Delivery completed</div>
+                                                <div class="text-muted small">GJ01AB1235 - 4.5 tons to Delhi</div>
+                                                <div class="text-muted small">Yesterday</div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex">
+                                            <div class="me-3">
+                                                <div class="bg-light rounded-circle p-2">
+                                                    <i class="bi bi-person-plus-fill text-info"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">New driver added</div>
+                                                <div class="text-muted small">Sanjay Verma - License: DL123456</div>
+                                                <div class="text-muted small">2 days ago</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Truck Tracking Tab -->
+                <div id="tracking" class="tab-content">
+                    <h2 class="mb-4">Truck Tracking System</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Live Truck Locations</span>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary me-2">
+                                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                                        </button>
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="bi bi-plus-circle"></i> Update Location
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="map-container">
+                                        <div class="truck-marker" style="top: 30%; left: 25%;" data-truck="GJ01AB1234">1</div>
+                                        <div class="truck-marker" style="top: 45%; left: 60%;" data-truck="GJ01AB1235">2</div>
+                                        <div class="truck-marker" style="top: 70%; left: 40%;" data-truck="GJ01AB1237">4</div>
+                                        <div class="truck-marker" style="top: 20%; left: 75%;" data-truck="GJ01AB1239">6</div>
+                                        <div class="truck-marker" style="top: 60%; left: 20%;" data-truck="GJ01AB1240">7</div>
+                                        <div class="truck-marker" style="top: 35%; left: 80%;" data-truck="GJ01AB1242">9</div>
+                                        <div class="truck-marker" style="top: 55%; left: 50%;" data-truck="GJ01AB1243">10</div>
+                                        
+                                        <div class="truck-info-popup" id="truckInfo">
+                                            <h6 id="popupTruckId">GJ01AB1234</h6>
+                                            <div><strong>Driver:</strong> <span id="popupDriver">Rajesh Kumar</span></div>
+                                            <div><strong>Location:</strong> <span id="popupLocation">Mumbai, Maharashtra</span></div>
+                                            <div><strong>Status:</strong> <span id="popupStatus">Active</span></div>
+                                            <div><strong>Last Update:</strong> <span id="popupLastUpdate">10 minutes ago</span></div>
+                                        </div>
+                                        
+                                        <div class="text-center">
+                                            <i class="bi bi-map" style="font-size: 3rem;"></i>
+                                            <p class="mt-2">Map View - Click on truck markers for details</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">Truck List</div>
+                                <div class="card-body">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Search by number plate...">
+                                        <button class="btn btn-outline-secondary" type="button">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                    <div class="list-group">
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1234</div>
+                                                <div class="small">Rajesh Kumar</div>
+                                            </div>
+                                            <span class="badge status-badge status-active">Active</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1235</div>
+                                                <div class="small">Amit Patel</div>
+                                            </div>
+                                            <span class="badge status-badge status-active">Active</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1236</div>
+                                                <div class="small">Vikram Singh</div>
+                                            </div>
+                                            <span class="badge status-badge status-maintenance">Maintenance</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1237</div>
+                                                <div class="small">Suresh Reddy</div>
+                                            </div>
+                                            <span class="badge status-badge status-active">Active</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1238</div>
+                                                <div class="small">Not Assigned</div>
+                                            </div>
+                                            <span class="badge status-badge status-inactive">Inactive</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1239</div>
+                                                <div class="small">Mahesh Sharma</div>
+                                            </div>
+                                            <span class="badge status-badge status-active">Active</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1240</div>
+                                                <div class="small">Anil Gupta</div>
+                                            </div>
+                                            <span class="badge status-badge status-active">Active</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1241</div>
+                                                <div class="small">Not Assigned</div>
+                                            </div>
+                                            <span class="badge status-badge status-inactive">Inactive</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1242</div>
+                                                <div class="small">Rahul Joshi</div>
+                                            </div>
+                                            <span class="badge status-badge status-active">Active</span>
+                                        </a>
+                                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-bold">GJ01AB1243</div>
+                                                <div class="small">Sunil Mehta</div>
+                                            </div>
+                                            <span class="badge status-badge status-active">Active</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">Update Truck Location</div>
+                        <div class="card-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="truckSelect" class="form-label">Select Truck</label>
+                                        <select class="form-select" id="truckSelect">
+                                            <option value="">Select Truck</option>
+                                            <option value="GJ01AB1234">GJ01AB1234 - Rajesh Kumar</option>
+                                            <option value="GJ01AB1235">GJ01AB1235 - Amit Patel</option>
+                                            <option value="GJ01AB1236">GJ01AB1236 - Vikram Singh</option>
+                                            <option value="GJ01AB1237">GJ01AB1237 - Suresh Reddy</option>
+                                            <option value="GJ01AB1238">GJ01AB1238 - Not Assigned</option>
+                                            <option value="GJ01AB1239">GJ01AB1239 - Mahesh Sharma</option>
+                                            <option value="GJ01AB1240">GJ01AB1240 - Anil Gupta</option>
+                                            <option value="GJ01AB1241">GJ01AB1241 - Not Assigned</option>
+                                            <option value="GJ01AB1242">GJ01AB1242 - Rahul Joshi</option>
+                                            <option value="GJ01AB1243">GJ01AB1243 - Sunil Mehta</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="currentLocation" class="form-label">Current Location</label>
+                                        <input type="text" class="form-control" id="currentLocation" placeholder="Enter location">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="updateTime" class="form-label">Update Time</label>
+                                        <input type="datetime-local" class="form-control" id="updateTime">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="locationNotes" class="form-label">Notes</label>
+                                        <textarea class="form-control" id="locationNotes" rows="2" placeholder="Additional notes about location..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-2">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Update Location</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driver Management Tab -->
+                <div id="drivers" class="tab-content">
+                    <h2 class="mb-4">Driver Management</h2>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Driver List</span>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDriverModal">
+                                <i class="bi bi-plus-circle me-1"></i>Add New Driver
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Photo</th>
+                                            <th>Name</th>
+                                            <th>License Number</th>
+                                            <th>Contact</th>
+                                            <th>Assigned Truck</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver1/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Rajesh Kumar</strong></td>
+                                            <td>DL01AB1234</td>
+                                            <td>+91 9876543210</td>
+                                            <td>GJ01AB1234</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver2/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Amit Patel</strong></td>
+                                            <td>DL02CD5678</td>
+                                            <td>+91 8765432109</td>
+                                            <td>GJ01AB1235</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver3/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Vikram Singh</strong></td>
+                                            <td>DL03EF9012</td>
+                                            <td>+91 7654321098</td>
+                                            <td>GJ01AB1236</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver4/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Suresh Reddy</strong></td>
+                                            <td>DL04GH3456</td>
+                                            <td>+91 6543210987</td>
+                                            <td>GJ01AB1237</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver5/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Mahesh Sharma</strong></td>
+                                            <td>DL05IJ7890</td>
+                                            <td>+91 5432109876</td>
+                                            <td>GJ01AB1239</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver6/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Anil Gupta</strong></td>
+                                            <td>DL06KL2345</td>
+                                            <td>+91 4321098765</td>
+                                            <td>GJ01AB1240</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver7/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Rahul Joshi</strong></td>
+                                            <td>DL07MN6789</td>
+                                            <td>+91 3210987654</td>
+                                            <td>GJ01AB1242</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://picsum.photos/seed/driver8/50/50.jpg" alt="Driver" class="driver-avatar"></td>
+                                            <td><strong>Sunil Mehta</strong></td>
+                                            <td>DL08OP0123</td>
+                                            <td>+91 2109876543</td>
+                                            <td>GJ01AB1243</td>
+                                            <td><span class="badge status-badge status-active">Active</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">Assign Driver to Truck</div>
+                        <div class="card-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="driverSelect" class="form-label">Select Driver</label>
+                                        <select class="form-select" id="driverSelect">
+                                            <option value="">Select Driver</option>
+                                            <option value="1">Rajesh Kumar</option>
+                                            <option value="2">Amit Patel</option>
+                                            <option value="3">Vikram Singh</option>
+                                            <option value="4">Suresh Reddy</option>
+                                            <option value="5">Mahesh Sharma</option>
+                                            <option value="6">Anil Gupta</option>
+                                            <option value="7">Rahul Joshi</option>
+                                            <option value="8">Sunil Mehta</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="truckAssign" class="form-label">Select Truck</label>
+                                        <select class="form-select" id="truckAssign">
+                                            <option value="">Select Truck</option>
+                                            <option value="GJ01AB1234">GJ01AB1234</option>
+                                            <option value="GJ01AB1235">GJ01AB1235</option>
+                                            <option value="GJ01AB1236">GJ01AB1236</option>
+                                            <option value="GJ01AB1237">GJ01AB1237</option>
+                                            <option value="GJ01AB1238">GJ01AB1238</option>
+                                            <option value="GJ01AB1239">GJ01AB1239</option>
+                                            <option value="GJ01AB1240">GJ01AB1240</option>
+                                            <option value="GJ01AB1241">GJ01AB1241</option>
+                                            <option value="GJ01AB1242">GJ01AB1242</option>
+                                            <option value="GJ01AB1243">GJ01AB1243</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="assignmentDate" class="form-label">Assignment Date</label>
+                                        <input type="date" class="form-control" id="assignmentDate">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="assignmentNotes" class="form-label">Notes</label>
+                                        <input type="text" class="form-control" id="assignmentNotes" placeholder="Any special instructions...">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-2">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Assign Driver</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Diesel Filling Logs Tab -->
+                <div id="diesel" class="tab-content">
+                    <h2 class="mb-4">Diesel Filling Logs</h2>
+                    
+                    <div class="filter-section mb-4">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="filterTruck" class="form-label">Filter by Truck</label>
+                                <select class="form-select" id="filterTruck">
+                                    <option value="">All Trucks</option>
+                                    <option value="GJ01AB1234">GJ01AB1234</option>
+                                    <option value="GJ01AB1235">GJ01AB1235</option>
+                                    <option value="GJ01AB1236">GJ01AB1236</option>
+                                    <option value="GJ01AB1237">GJ01AB1237</option>
+                                    <option value="GJ01AB1238">GJ01AB1238</option>
+                                    <option value="GJ01AB1239">GJ01AB1239</option>
+                                    <option value="GJ01AB1240">GJ01AB1240</option>
+                                    <option value="GJ01AB1241">GJ01AB1241</option>
+                                    <option value="GJ01AB1242">GJ01AB1242</option>
+                                    <option value="GJ01AB1243">GJ01AB1243</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="filterMonth" class="form-label">Filter by Month</label>
+                                <select class="form-select" id="filterMonth">
+                                    <option value="">All Months</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="filterYear" class="form-label">Filter by Year</label>
+                                <select class="form-select" id="filterYear">
+                                    <option value="">All Years</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3 d-flex align-items-end">
+                                <button class="btn btn-primary w-100">Apply Filters</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Diesel Filling History</span>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDieselModal">
+                                <i class="bi bi-plus-circle me-1"></i>Add Diesel Log
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Truck</th>
+                                            <th>Location</th>
+                                            <th>Liters</th>
+                                            <th>Price/Liter</th>
+                                            <th>Total Cost</th>
+                                            <th>Odometer Reading</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2023-06-15</td>
+                                            <td><strong>GJ01AB1234</strong></td>
+                                            <td>Mumbai, Maharashtra</td>
+                                            <td>150</td>
+                                            <td>$95.50</td>
+                                            <td>$14,325</td>
+                                            <td>45,230 km</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-06-14</td>
+                                            <td><strong>GJ01AB1235</strong></td>
+                                            <td>Delhi, NCR</td>
+                                            <td>180</td>
+                                            <td>$96.00</td>
+                                            <td>$17,280</td>
+                                            <td>38,450 km</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-06-12</td>
+                                            <td><strong>GJ01AB1237</strong></td>
+                                            <td>Bangalore, Karnataka</td>
+                                            <td>165</td>
+                                            <td>$97.25</td>
+                                            <td>$16,046</td>
+                                            <td>52,100 km</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-06-10</td>
+                                            <td><strong>GJ01AB1239</strong></td>
+                                            <td>Pune, Maharashtra</td>
+                                            <td>140</td>
+                                            <td>$95.00</td>
+                                            <td>$13,300</td>
+                                            <td>41,780 km</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-06-08</td>
+                                            <td><strong>GJ01AB1242</strong></td>
+                                            <td>Jaipur, Rajasthan</td>
+                                            <td>155</td>
+                                            <td>$94.75</td>
+                                            <td>$14,686</td>
+                                            <td>36,920 km</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-06-05</td>
+                                            <td><strong>GJ01AB1240</strong></td>
+                                            <td>Ahmedabad, Gujarat</td>
+                                            <td>170</td>
+                                            <td>$95.25</td>
+                                            <td>$16,192</td>
+                                            <td>48,350 km</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Diesel Consumption by Truck</div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="dieselChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Monthly Diesel Cost</div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="costChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Truck Maintenance Tab -->
+                <div id="maintenance" class="tab-content">
+                    <h2 class="mb-4">Truck Maintenance & Parts</h2>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Maintenance Records</span>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMaintenanceModal">
+                                <i class="bi bi-plus-circle me-1"></i>Add Maintenance Record
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Truck</th>
+                                            <th>Part/Service</th>
+                                            <th>Cost</th>
+                                            <th>Service Center</th>
+                                            <th>Next Due</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>2023-06-10</td>
+                                            <td><strong>GJ01AB1236</strong></td>
+                                            <td>Oil Change</td>
+                                            <td>$3,500</td>
+                                            <td>ABC Motors, Ahmedabad</td>
+                                            <td>2023-09-10</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-06-05</td>
+                                            <td><strong>GJ01AB1234</strong></td>
+                                            <td>Tyre Replacement</td>
+                                            <td>$12,000</td>
+                                            <td>XYZ Tyres, Mumbai</td>
+                                            <td>2024-06-05</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-05-28</td>
+                                            <td><strong>GJ01AB1239</strong></td>
+                                            <td>Battery Replacement</td>
+                                            <td>$8,500</td>
+                                            <td>Pune Auto Care</td>
+                                            <td>2025-05-28</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-05-20</td>
+                                            <td><strong>GJ01AB1242</strong></td>
+                                            <td>Brake Pad Replacement</td>
+                                            <td>$4,200</td>
+                                            <td>Jaipur Truck Service</td>
+                                            <td>2023-11-20</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>2023-05-15</td>
+                                            <td><strong>GJ01AB1237</strong></td>
+                                            <td>Air Filter Replacement</td>
+                                            <td>$1,800</td>
+                                            <td>Bangalore Motors</td>
+                                            <td>2023-08-15</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil"></i></button>
+                                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">Upcoming Maintenance</div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Truck</th>
+                                            <th>Maintenance Type</th>
+                                            <th>Due Date</th>
+                                            <th>Days Remaining</th>
+                                            <th>Estimated Cost</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>GJ01AB1236</strong></td>
+                                            <td>Oil Change</td>
+                                            <td>2023-06-25</td>
+                                            <td><span class="badge bg-warning">5 days</span></td>
+                                            <td>$3,500</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary">Schedule</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1242</strong></td>
+                                            <td>Brake Inspection</td>
+                                            <td>2023-07-05</td>
+                                            <td><span class="badge bg-info">15 days</span></td>
+                                            <td>$2,000</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary">Schedule</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1237</strong></td>
+                                            <td>Air Filter Replacement</td>
+                                            <td>2023-07-15</td>
+                                            <td><span class="badge bg-info">25 days</span></td>
+                                            <td>$1,800</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary">Schedule</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">Add New Items/Parts to Truck</div>
+                        <div class="card-body">
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="itemTruck" class="form-label">Select Truck</label>
+                                        <select class="form-select" id="itemTruck">
+                                            <option value="">Select Truck</option>
+                                            <option value="GJ01AB1234">GJ01AB1234</option>
+                                            <option value="GJ01AB1235">GJ01AB1235</option>
+                                            <option value="GJ01AB1236">GJ01AB1236</option>
+                                            <option value="GJ01AB1237">GJ01AB1237</option>
+                                            <option value="GJ01AB1238">GJ01AB1238</option>
+                                            <option value="GJ01AB1239">GJ01AB1239</option>
+                                            <option value="GJ01AB1240">GJ01AB1240</option>
+                                            <option value="GJ01AB1241">GJ01AB1241</option>
+                                            <option value="GJ01AB1242">GJ01AB1242</option>
+                                            <option value="GJ01AB1243">GJ01AB1243</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="itemType" class="form-label">Item Type</label>
+                                        <select class="form-select" id="itemType">
+                                            <option value="">Select Item Type</option>
+                                            <option value="tyre">Spare Tyre</option>
+                                            <option value="tools">Tools</option>
+                                            <option value="jack">Jack</option>
+                                            <option value="firstaid">First Aid Kit</option>
+                                            <option value="fire">Fire Extinguisher</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="itemName" class="form-label">Item Name</label>
+                                        <input type="text" class="form-control" id="itemName" placeholder="Enter item name">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="itemCost" class="form-label">Cost</label>
+                                        <input type="number" class="form-control" id="itemCost" placeholder="Enter cost">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="itemNotes" class="form-label">Notes</label>
+                                        <textarea class="form-control" id="itemNotes" rows="2" placeholder="Additional notes about the item..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-2">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Add Item</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material Pickup & Drop Management Tab -->
+                <div id="delivery" class="tab-content">
+                    <h2 class="mb-4">Material Pickup & Drop Management</h2>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Delivery Management</span>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
+                                <i class="bi bi-plus-circle me-1"></i>Add New Delivery
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Delivery ID</th>
+                                            <th>Truck</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Item Type</th>
+                                            <th>Weight</th>
+                                            <th>Customer</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>DLV202306001</strong></td>
+                                            <td>GJ01AB1234</td>
+                                            <td>Mumbai, Maharashtra</td>
+                                            <td>Pune, Maharashtra</td>
+                                            <td>Electronics</td>
+                                            <td>4.5 tons</td>
+                                            <td>Tech Solutions Ltd.</td>
+                                            <td><span class="badge status-badge status-active">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Confirm</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>DLV202306002</strong></td>
+                                            <td>GJ01AB1235</td>
+                                            <td>Delhi, NCR</td>
+                                            <td>Jaipur, Rajasthan</td>
+                                            <td>Textiles</td>
+                                            <td>6.2 tons</td>
+                                            <td>Rajasthan Fabrics</td>
+                                            <td><span class="badge status-badge status-active">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Confirm</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>DLV202306003</strong></td>
+                                            <td>GJ01AB1237</td>
+                                            <td>Bangalore, Karnataka</td>
+                                            <td>Chennai, Tamil Nadu</td>
+                                            <td>Automotive Parts</td>
+                                            <td>3.8 tons</td>
+                                            <td>South Motors</td>
+                                            <td><span class="badge status-badge status-active">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Confirm</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>DLV202306004</strong></td>
+                                            <td>GJ01AB1239</td>
+                                            <td>Ahmedabad, Gujarat</td>
+                                            <td>Surat, Gujarat</td>
+                                            <td>Chemicals</td>
+                                            <td>5.5 tons</td>
+                                            <td>Gujarat Chemicals</td>
+                                            <td><span class="badge status-badge status-active">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Confirm</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>DLV202306005</strong></td>
+                                            <td>GJ01AB1240</td>
+                                            <td>Kolkata, West Bengal</td>
+                                            <td>Bhubaneswar, Odisha</td>
+                                            <td>Steel Products</td>
+                                            <td>7.2 tons</td>
+                                            <td>East Steel Industries</td>
+                                            <td><span class="badge status-badge status-active">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Confirm</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>DLV202306006</strong></td>
+                                            <td>GJ01AB1242</td>
+                                            <td>Hyderabad, Telangana</td>
+                                            <td>Vijayawada, Andhra Pradesh</td>
+                                            <td>Pharmaceuticals</td>
+                                            <td>2.9 tons</td>
+                                            <td>MediCare Pharma</td>
+                                            <td><span class="badge status-badge status-active">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Confirm</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>DLV202306007</strong></td>
+                                            <td>GJ01AB1243</td>
+                                            <td>Chandigarh</td>
+                                            <td>Shimla, Himachal Pradesh</td>
+                                            <td>Furniture</td>
+                                            <td>4.1 tons</td>
+                                            <td>Himachal Furnishings</td>
+                                            <td><span class="badge status-badge status-active">In Transit</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Confirm</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Delivery Confirmation</div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="deliveryId" class="form-label">Delivery ID</label>
+                                                <input type="text" class="form-control" id="deliveryId" placeholder="Enter delivery ID">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="confirmTime" class="form-label">Delivery Time</label>
+                                                <input type="datetime-local" class="form-control" id="confirmTime">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="deliveryNotes" class="form-label">Delivery Notes</label>
+                                                <textarea class="form-control" id="deliveryNotes" rows="3" placeholder="Any issues or special notes about the delivery..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="receiverName" class="form-label">Receiver Name</label>
+                                                <input type="text" class="form-control" id="receiverName" placeholder="Name of person who received the delivery">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="receiverSignature" class="form-label">Receiver Signature</label>
+                                                <div class="border rounded p-3 text-center">
+                                                    <i class="bi bi-pencil-square" style="font-size: 2rem; color: #ccc;"></i>
+                                                    <p class="text-muted mt-2">Click to sign</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-secondary me-2">Cancel</button>
+                                            <button type="submit" class="btn btn-success">Confirm Delivery</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Delivery Statistics</div>
+                                <div class="card-body">
+                                    <div class="row mb-4">
+                                        <div class="col-6 text-center">
+                                            <div class="stat-value">24</div>
+                                            <div class="stat-label">Total Deliveries</div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="stat-value">17</div>
+                                            <div class="stat-label">Completed</div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
+                                        <div class="col-6 text-center">
+                                            <div class="stat-value">7</div>
+                                            <div class="stat-label">In Transit</div>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <div class="stat-value">142.5</div>
+                                            <div class="stat-label">Tons Delivered</div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-container">
+                                        <canvas id="deliveryChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trip Logs Tab -->
+                <div id="trips" class="tab-content">
+                    <h2 class="mb-4">Trip Logs</h2>
+                    
+                    <div class="filter-section mb-4">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="tripTruck" class="form-label">Filter by Truck</label>
+                                <select class="form-select" id="tripTruck">
+                                    <option value="">All Trucks</option>
+                                    <option value="GJ01AB1234">GJ01AB1234</option>
+                                    <option value="GJ01AB1235">GJ01AB1235</option>
+                                    <option value="GJ01AB1236">GJ01AB1236</option>
+                                    <option value="GJ01AB1237">GJ01AB1237</option>
+                                    <option value="GJ01AB1238">GJ01AB1238</option>
+                                    <option value="GJ01AB1239">GJ01AB1239</option>
+                                    <option value="GJ01AB1240">GJ01AB1240</option>
+                                    <option value="GJ01AB1241">GJ01AB1241</option>
+                                    <option value="GJ01AB1242">GJ01AB1242</option>
+                                    <option value="GJ01AB1243">GJ01AB1243</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="tripDriver" class="form-label">Filter by Driver</label>
+                                <select class="form-select" id="tripDriver">
+                                    <option value="">All Drivers</option>
+                                    <option value="1">Rajesh Kumar</option>
+                                    <option value="2">Amit Patel</option>
+                                    <option value="3">Vikram Singh</option>
+                                    <option value="4">Suresh Reddy</option>
+                                    <option value="5">Mahesh Sharma</option>
+                                    <option value="6">Anil Gupta</option>
+                                    <option value="7">Rahul Joshi</option>
+                                    <option value="8">Sunil Mehta</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="tripStatus" class="form-label">Filter by Status</label>
+                                <select class="form-select" id="tripStatus">
+                                    <option value="">All Status</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="scheduled">Scheduled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3 d-flex align-items-end">
+                                <button class="btn btn-primary w-100">Apply Filters</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Trip History</span>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTripModal">
+                                <i class="bi bi-plus-circle me-1"></i>Add New Trip
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Trip ID</th>
+                                            <th>Truck</th>
+                                            <th>Driver</th>
+                                            <th>Start Date/Time</th>
+                                            <th>End Date/Time</th>
+                                            <th>Distance</th>
+                                            <th>Duration</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>TRP202306001</strong></td>
+                                            <td>GJ01AB1234</td>
+                                            <td>Rajesh Kumar</td>
+                                            <td>2023-06-10 08:00</td>
+                                            <td>2023-06-12 16:30</td>
+                                            <td>650 km</td>
+                                            <td>2 days 8.5 hrs</td>
+                                            <td><span class="badge status-badge status-active">Completed</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TRP202306002</strong></td>
+                                            <td>GJ01AB1235</td>
+                                            <td>Amit Patel</td>
+                                            <td>2023-06-12 09:30</td>
+                                            <td>2023-06-14 14:15</td>
+                                            <td>480 km</td>
+                                            <td>2 days 4.75 hrs</td>
+                                            <td><span class="badge status-badge status-active">Completed</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TRP202306003</strong></td>
+                                            <td>GJ01AB1237</td>
+                                            <td>Suresh Reddy</td>
+                                            <td>2023-06-14 07:00</td>
+                                            <td>2023-06-16 11:45</td>
+                                            <td>720 km</td>
+                                            <td>2 days 4.75 hrs</td>
+                                            <td><span class="badge status-badge status-active">Completed</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TRP202306004</strong></td>
+                                            <td>GJ01AB1239</td>
+                                            <td>Mahesh Sharma</td>
+                                            <td>2023-06-16 10:15</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td><span class="badge status-badge status-active">In Progress</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">End Trip</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TRP202306005</strong></td>
+                                            <td>GJ01AB1240</td>
+                                            <td>Anil Gupta</td>
+                                            <td>2023-06-18 08:30</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td><span class="badge bg-info">Scheduled</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Start Trip</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TRP202306006</strong></td>
+                                            <td>GJ01AB1242</td>
+                                            <td>Rahul Joshi</td>
+                                            <td>2023-06-20 09:00</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td><span class="badge bg-info">Scheduled</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Start Trip</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TRP202306007</strong></td>
+                                            <td>GJ01AB1243</td>
+                                            <td>Sunil Mehta</td>
+                                            <td>2023-06-22 07:45</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td><span class="badge bg-info">Scheduled</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-eye"></i></button>
+                                                <button class="btn btn-sm btn-outline-success">Start Trip</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Distance Covered by Truck</div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="distanceChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Trip Duration Analysis</div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="durationChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reports" class="tab-content">
+                    <h2 class="mb-4">Reports & Dashboard</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card primary">
+                                <div class="card-body">
+                                    <div class="stat-label">Total Diesel Cost</div>
+                                    <div class="stat-value">$4,250</div>
+                                    <div class="text-muted small">This month</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card success">
+                                <div class="card-body">
+                                    <div class="stat-label">Total Trips</div>
+                                    <div class="stat-value">24</div>
+                                    <div class="text-muted small">This month</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card warning">
+                                <div class="card-body">
+                                    <div class="stat-label">Tons Delivered</div>
+                                    <div class="stat-value">142.5</div>
+                                    <div class="text-muted small">This month</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card stat-card danger">
+                                <div class="card-body">
+                                    <div class="stat-label">Maintenance Cost</div>
+                                    <div class="stat-value">$32,000</div>
+                                    <div class="text-muted small">This month</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Truck-wise Summary Report</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="bi bi-download"></i> Export
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-printer"></i> Print
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Truck ID</th>
+                                            <th>Driver</th>
+                                            <th>Total Trips</th>
+                                            <th>Total Distance</th>
+                                            <th>Diesel Consumed</th>
+                                            <th>Diesel Cost</th>
+                                            <th>Maintenance Cost</th>
+                                            <th>Tons Delivered</th>
+                                            <th>Performance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>GJ01AB1234</strong></td>
+                                            <td>Rajesh Kumar</td>
+                                            <td>4</td>
+                                            <td>2,450 km</td>
+                                            <td>610 liters</td>
+                                            <td>$58,255</td>
+                                            <td>$15,500</td>
+                                            <td>18.5 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" style="width: 85%">85%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1235</strong></td>
+                                            <td>Amit Patel</td>
+                                            <td>3</td>
+                                            <td>1,820 km</td>
+                                            <td>455 liters</td>
+                                            <td>$43,475</td>
+                                            <td>$8,200</td>
+                                            <td>15.2 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" style="width: 92%">92%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1236</strong></td>
+                                            <td>Vikram Singh</td>
+                                            <td>2</td>
+                                            <td>1,250 km</td>
+                                            <td>312 liters</td>
+                                            <td>$29,700</td>
+                                            <td>$3,500</td>
+                                            <td>9.8 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-warning" style="width: 75%">75%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1237</strong></td>
+                                            <td>Suresh Reddy</td>
+                                            <td>3</td>
+                                            <td>2,100 km</td>
+                                            <td>525 liters</td>
+                                            <td>$50,062</td>
+                                            <td>$1,800</td>
+                                            <td>16.7 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" style="width: 88%">88%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1238</strong></td>
+                                            <td>Not Assigned</td>
+                                            <td>0</td>
+                                            <td>0 km</td>
+                                            <td>0 liters</td>
+                                            <td>$0</td>
+                                            <td>$0</td>
+                                            <td>0 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-danger" style="width: 0%">0%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1239</strong></td>
+                                            <td>Mahesh Sharma</td>
+                                            <td>3</td>
+                                            <td>1,950 km</td>
+                                            <td>487 liters</td>
+                                            <td>$46,432</td>
+                                            <td>$8,500</td>
+                                            <td>14.3 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" style="width: 90%">90%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1240</strong></td>
+                                            <td>Anil Gupta</td>
+                                            <td>2</td>
+                                            <td>1,650 km</td>
+                                            <td>412 liters</td>
+                                            <td>$39,270</td>
+                                            <td>$0</td>
+                                            <td>12.5 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-warning" style="width: 78%">78%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1241</strong></td>
+                                            <td>Not Assigned</td>
+                                            <td>0</td>
+                                            <td>0 km</td>
+                                            <td>0 liters</td>
+                                            <td>$0</td>
+                                            <td>$0</td>
+                                            <td>0 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-danger" style="width: 0%">0%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1242</strong></td>
+                                            <td>Rahul Joshi</td>
+                                            <td>3</td>
+                                            <td>2,200 km</td>
+                                            <td>550 liters</td>
+                                            <td>$52,412</td>
+                                            <td>$4,200</td>
+                                            <td>17.8 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" style="width: 95%">95%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>GJ01AB1243</strong></td>
+                                            <td>Sunil Mehta</td>
+                                            <td>4</td>
+                                            <td>2,350 km</td>
+                                            <td>587 liters</td>
+                                            <td>$55,972</td>
+                                            <td>$0</td>
+                                            <td>18.2 tons</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" style="width: 82%">82%</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Monthly Cost Analysis</div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="costAnalysisChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">Truck Performance Comparison</div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="performanceChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Driver Modal -->
+    <div class="modal fade" id="addDriverModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Driver</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="driverName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="driverName" placeholder="Enter full name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="driverLicense" class="form-label">License Number</label>
+                                <input type="text" class="form-control" id="driverLicense" placeholder="Enter license number">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="driverPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="driverPhone" placeholder="Enter phone number">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="driverEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="driverEmail" placeholder="Enter email address">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="driverAddress" class="form-label">Address</label>
+                                <textarea class="form-control" id="driverAddress" rows="2" placeholder="Enter address"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="driverLicenseExpiry" class="form-label">License Expiry Date</label>
+                                <input type="date" class="form-control" id="driverLicenseExpiry">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="driverPhoto" class="form-label">Driver Photo</label>
+                            <input type="file" class="form-control" id="driverPhoto">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save Driver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Diesel Log Modal -->
+    <div class="modal fade" id="addDieselModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Diesel Log</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dieselTruck" class="form-label">Truck</label>
+                                <select class="form-select" id="dieselTruck">
+                                    <option value="">Select Truck</option>
+                                    <option value="GJ01AB1234">GJ01AB1234</option>
+                                    <option value="GJ01AB1235">GJ01AB1235</option>
+                                    <option value="GJ01AB1236">GJ01AB1236</option>
+                                    <option value="GJ01AB1237">GJ01AB1237</option>
+                                    <option value="GJ01AB1238">GJ01AB1238</option>
+                                    <option value="GJ01AB1239">GJ01AB1239</option>
+                                    <option value="GJ01AB1240">GJ01AB1240</option>
+                                    <option value="GJ01AB1241">GJ01AB1241</option>
+                                    <option value="GJ01AB1242">GJ01AB1242</option>
+                                    <option value="GJ01AB1243">GJ01AB1243</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="dieselDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="dieselDate">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dieselLocation" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="dieselLocation" placeholder="Enter location">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="dieselLiters" class="form-label">Liters</label>
+                                <input type="number" class="form-control" id="dieselLiters" placeholder="Enter liters">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dieselPrice" class="form-label">Price per Liter</label>
+                                <input type="number" class="form-control" id="dieselPrice" placeholder="Enter price per liter">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="dieselOdometer" class="form-label">Odometer Reading</label>
+                                <input type="number" class="form-control" id="dieselOdometer" placeholder="Enter odometer reading">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dieselNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="dieselNotes" rows="2" placeholder="Additional notes..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save Diesel Log</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Maintenance Modal -->
+    <div class="modal fade" id="addMaintenanceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Maintenance Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="maintenanceTruck" class="form-label">Truck</label>
+                                <select class="form-select" id="maintenanceTruck">
+                                    <option value="">Select Truck</option>
+                                    <option value="GJ01AB1234">GJ01AB1234</option>
+                                    <option value="GJ01AB1235">GJ01AB1235</option>
+                                    <option value="GJ01AB1236">GJ01AB1236</option>
+                                    <option value="GJ01AB1237">GJ01AB1237</option>
+                                    <option value="GJ01AB1238">GJ01AB1238</option>
+                                    <option value="GJ01AB1239">GJ01AB1239</option>
+                                    <option value="GJ01AB1240">GJ01AB1240</option>
+                                    <option value="GJ01AB1241">GJ01AB1241</option>
+                                    <option value="GJ01AB1242">GJ01AB1242</option>
+                                    <option value="GJ01AB1243">GJ01AB1243</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="maintenanceDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="maintenanceDate">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="maintenanceType" class="form-label">Maintenance Type</label>
+                                <select class="form-select" id="maintenanceType">
+                                    <option value="">Select Type</option>
+                                    <option value="oil">Oil Change</option>
+                                    <option value="tyre">Tyre Replacement</option>
+                                    <option value="battery">Battery Replacement</option>
+                                    <option value="brake">Brake Service</option>
+                                    <option value="filter">Filter Replacement</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="maintenanceCost" class="form-label">Cost</label>
+                                <input type="number" class="form-control" id="maintenanceCost" placeholder="Enter cost">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="maintenanceCenter" class="form-label">Service Center</label>
+                                <input type="text" class="form-control" id="maintenanceCenter" placeholder="Enter service center name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="maintenanceNextDue" class="form-label">Next Due Date</label>
+                                <input type="date" class="form-control" id="maintenanceNextDue">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maintenanceNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="maintenanceNotes" rows="2" placeholder="Additional notes..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save Maintenance Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Delivery Modal -->
+    <div class="modal fade" id="addDeliveryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Delivery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="deliveryTruck" class="form-label">Truck</label>
+                                <select class="form-select" id="deliveryTruck">
+                                    <option value="">Select Truck</option>
+                                    <option value="GJ01AB1234">GJ01AB1234</option>
+                                    <option value="GJ01AB1235">GJ01AB1235</option>
+                                    <option value="GJ01AB1236">GJ01AB1236</option>
+                                    <option value="GJ01AB1237">GJ01AB1237</option>
+                                    <option value="GJ01AB1238">GJ01AB1238</option>
+                                    <option value="GJ01AB1239">GJ01AB1239</option>
+                                    <option value="GJ01AB1240">GJ01AB1240</option>
+                                    <option value="GJ01AB1241">GJ01AB1241</option>
+                                    <option value="GJ01AB1242">GJ01AB1242</option>
+                                    <option value="GJ01AB1243">GJ01AB1243</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="deliveryDate" class="form-label">Pickup Date</label>
+                                <input type="datetime-local" class="form-control" id="deliveryDate">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="pickupLocation" class="form-label">Pickup Location</label>
+                                <input type="text" class="form-control" id="pickupLocation" placeholder="Enter pickup location">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="deliveryLocation" class="form-label">Delivery Location</label>
+                                <input type="text" class="form-control" id="deliveryLocation" placeholder="Enter delivery location">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="itemType" class="form-label">Item Type</label>
+                                <select class="form-select" id="itemType">
+                                    <option value="">Select Item Type</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="textiles">Textiles</option>
+                                    <option value="automotive">Automotive Parts</option>
+                                    <option value="chemicals">Chemicals</option>
+                                    <option value="steel">Steel Products</option>
+                                    <option value="pharma">Pharmaceuticals</option>
+                                    <option value="furniture">Furniture</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="itemWeight" class="form-label">Weight (tons)</label>
+                                <input type="number" class="form-control" id="itemWeight" placeholder="Enter weight in tons" step="0.1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="customerName" class="form-label">Customer Name</label>
+                                <input type="text" class="form-control" id="customerName" placeholder="Enter customer name">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customerContact" class="form-label">Customer Contact</label>
+                                <input type="text" class="form-control" id="customerContact" placeholder="Enter customer contact number">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="expectedDelivery" class="form-label">Expected Delivery Date</label>
+                                <input type="datetime-local" class="form-control" id="expectedDelivery">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="deliveryInstructions" class="form-label">Special Instructions</label>
+                            <textarea class="form-control" id="deliveryInstructions" rows="2" placeholder="Any special handling instructions..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save Delivery</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Trip Modal -->
+    <div class="modal fade" id="addTripModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Trip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tripTruckSelect" class="form-label">Truck</label>
+                                <select class="form-select" id="tripTruckSelect">
+                                    <option value="">Select Truck</option>
+                                    <option value="GJ01AB1234">GJ01AB1234</option>
+                                    <option value="GJ01AB1235">GJ01AB1235</option>
+                                    <option value="GJ01AB1236">GJ01AB1236</option>
+                                    <option value="GJ01AB1237">GJ01AB1237</option>
+                                    <option value="GJ01AB1238">GJ01AB1238</option>
+                                    <option value="GJ01AB1239">GJ01AB1239</option>
+                                    <option value="GJ01AB1240">GJ01AB1240</option>
+                                    <option value="GJ01AB1241">GJ01AB1241</option>
+                                    <option value="GJ01AB1242">GJ01AB1242</option>
+                                    <option value="GJ01AB1243">GJ01AB1243</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tripDriverSelect" class="form-label">Driver</label>
+                                <select class="form-select" id="tripDriverSelect">
+                                    <option value="">Select Driver</option>
+                                    <option value="1">Rajesh Kumar</option>
+                                    <option value="2">Amit Patel</option>
+                                    <option value="3">Vikram Singh</option>
+                                    <option value="4">Suresh Reddy</option>
+                                    <option value="5">Mahesh Sharma</option>
+                                    <option value="6">Anil Gupta</option>
+                                    <option value="7">Rahul Joshi</option>
+                                    <option value="8">Sunil Mehta</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tripStartDate" class="form-label">Start Date & Time</label>
+                                <input type="datetime-local" class="form-control" id="tripStartDate">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tripEndDate" class="form-label">Expected End Date & Time</label>
+                                <input type="datetime-local" class="form-control" id="tripEndDate">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tripStartLocation" class="form-label">Start Location</label>
+                                <input type="text" class="form-control" id="tripStartLocation" placeholder="Enter start location">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tripEndLocation" class="form-label">End Location</label>
+                                <input type="text" class="form-control" id="tripEndLocation" placeholder="Enter end location">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tripDistance" class="form-label">Estimated Distance (km)</label>
+                                <input type="number" class="form-control" id="tripDistance" placeholder="Enter estimated distance">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tripDelivery" class="form-label">Associated Delivery</label>
+                                <select class="form-select" id="tripDelivery">
+                                    <option value="">Select Delivery (Optional)</option>
+                                    <option value="DLV202306001">DLV202306001</option>
+                                    <option value="DLV202306002">DLV202306002</option>
+                                    <option value="DLV202306003">DLV202306003</option>
+                                    <option value="DLV202306004">DLV202306004</option>
+                                    <option value="DLV202306005">DLV202306005</option>
+                                    <option value="DLV202306006">DLV202306006</option>
+                                    <option value="DLV202306007">DLV202306007</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tripNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="tripNotes" rows="2" placeholder="Additional notes about the trip..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save Trip</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Tab navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link[data-tab]');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all nav links and tab contents
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    tabContents.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked nav link and corresponding tab content
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Initialize charts when reports tab is opened
+                    if (tabId === 'reports') {
+                        initializeCharts();
+                    }
+                });
+            });
+            
+            // Truck marker click functionality
+            const truckMarkers = document.querySelectorAll('.truck-marker');
+            const truckInfoPopup = document.getElementById('truckInfo');
+            
+            truckMarkers.forEach(marker => {
+                marker.addEventListener('click', function() {
+                    const truckId = this.getAttribute('data-truck');
+                    
+                    // Update popup content based on truck ID
+                    // In a real application, this would fetch data from a database
+                    const truckData = {
+                        'GJ01AB1234': {
+                            driver: 'Rajesh Kumar',
+                            location: 'Mumbai, Maharashtra',
+                            status: 'Active',
+                            lastUpdate: '10 minutes ago'
+                        },
+                        'GJ01AB1235': {
+                            driver: 'Amit Patel',
+                            location: 'Delhi, NCR',
+                            status: 'Active',
+                            lastUpdate: '25 minutes ago'
+                        },
+                        'GJ01AB1237': {
+                            driver: 'Suresh Reddy',
+                            location: 'Bangalore, Karnataka',
+                            status: 'Active',
+                            lastUpdate: '45 minutes ago'
+                        },
+                        'GJ01AB1239': {
+                            driver: 'Mahesh Sharma',
+                            location: 'Pune, Maharashtra',
+                            status: 'Active',
+                            lastUpdate: '1 hour ago'
+                        },
+                        'GJ01AB1240': {
+                            driver: 'Anil Gupta',
+                            location: 'Ahmedabad, Gujarat',
+                            status: 'Active',
+                            lastUpdate: '1.5 hours ago'
+                        },
+                        'GJ01AB1242': {
+                            driver: 'Rahul Joshi',
+                            location: 'Jaipur, Rajasthan',
+                            status: 'Active',
+                            lastUpdate: '2 hours ago'
+                        },
+                        'GJ01AB1243': {
+                            driver: 'Sunil Mehta',
+                            location: 'Chandigarh',
+                            status: 'Active',
+                            lastUpdate: '3 hours ago'
+                        }
+                    };
+                    
+                    const data = truckData[truckId];
+                    if (data) {
+                        document.getElementById('popupTruckId').textContent = truckId;
+                        document.getElementById('popupDriver').textContent = data.driver;
+                        document.getElementById('popupLocation').textContent = data.location;
+                        document.getElementById('popupStatus').textContent = data.status;
+                        document.getElementById('popupLastUpdate').textContent = data.lastUpdate;
+                        
+                        // Position popup near the marker
+                        const markerRect = this.getBoundingClientRect();
+                        const mapContainer = document.querySelector('.map-container');
+                        const mapRect = mapContainer.getBoundingClientRect();
+                        
+                        truckInfoPopup.style.left = (markerRect.left - mapRect.left + 40) + 'px';
+                        truckInfoPopup.style.top = (markerRect.top - mapRect.top - 10) + 'px';
+                        truckInfoPopup.style.display = 'block';
+                        
+                        // Hide popup after 5 seconds
+                        setTimeout(() => {
+                            truckInfoPopup.style.display = 'none';
+                        }, 5000);
+                    }
+                });
+            });
+            
+            // Hide popup when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.classList.contains('truck-marker') && !truckInfoPopup.contains(e.target)) {
+                    truckInfoPopup.style.display = 'none';
+                }
+            });
+            
+            // Initialize charts for diesel tab
+            const dieselTab = document.getElementById('diesel');
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (dieselTab.classList.contains('active')) {
+                            initializeDieselCharts();
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(dieselTab, { attributes: true });
+            
+            // Initialize charts for delivery tab
+            const deliveryTab = document.getElementById('delivery');
+            const deliveryObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (deliveryTab.classList.contains('active')) {
+                            initializeDeliveryChart();
+                        }
+                    }
+                });
+            });
+            
+            deliveryObserver.observe(deliveryTab, { attributes: true });
+            
+            // Initialize charts for trips tab
+            const tripsTab = document.getElementById('trips');
+            const tripsObserver = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (tripsTab.classList.contains('active')) {
+                            initializeTripsCharts();
+                        }
+                    }
+                });
+            });
+            
+            tripsObserver.observe(tripsTab, { attributes: true });
+            
+            // Set current date/time for forms
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const currentDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            document.getElementById('updateTime').value = currentDateTime;
+            document.getElementById('confirmTime').value = currentDateTime;
+            document.getElementById('deliveryDate').value = currentDateTime;
+            document.getElementById('tripStartDate').value = currentDateTime;
+            
+            // Set date inputs to today's date
+            const currentDate = `${year}-${month}-${day}`;
+            document.getElementById('assignmentDate').value = currentDate;
+            document.getElementById('dieselDate').value = currentDate;
+            document.getElementById('maintenanceDate').value = currentDate;
+        });
+        
+        function initializeDieselCharts() {
+            // Diesel Consumption by Truck Chart
+            const dieselCtx = document.getElementById('dieselChart');
+            if (dieselCtx) {
+                new Chart(dieselCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['GJ01AB1234', 'GJ01AB1235', 'GJ01AB1237', 'GJ01AB1239', 'GJ01AB1240', 'GJ01AB1242'],
+                        datasets: [{
+                            label: 'Diesel Consumption (Liters)',
+                            data: [610, 455, 525, 487, 412, 550],
+                            backgroundColor: 'rgba(26, 115, 232, 0.7)',
+                            borderColor: 'rgba(26, 115, 232, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Monthly Diesel Cost Chart
+            const costCtx = document.getElementById('costChart');
+            if (costCtx) {
+                new Chart(costCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Diesel Cost ($)',
+                            data: [3800, 4200, 3900, 4100, 4300, 4250],
+                            backgroundColor: 'rgba(52, 168, 83, 0.2)',
+                            borderColor: 'rgba(52, 168, 83, 1)',
+                            borderWidth: 2,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function initializeDeliveryChart() {
+            const deliveryCtx = document.getElementById('deliveryChart');
+            if (deliveryCtx) {
+                new Chart(deliveryCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'In Transit', 'Scheduled'],
+                        datasets: [{
+                            data: [17, 7, 3],
+                            backgroundColor: [
+                                'rgba(52, 168, 83, 0.7)',
+                                'rgba(26, 115, 232, 0.7)',
+                                'rgba(251, 188, 4, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(52, 168, 83, 1)',
+                                'rgba(26, 115, 232, 1)',
+                                'rgba(251, 188, 4, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        }
+        
+        function initializeTripsCharts() {
+            // Distance Covered by Truck Chart
+            const distanceCtx = document.getElementById('distanceChart');
+            if (distanceCtx) {
+                new Chart(distanceCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['GJ01AB1234', 'GJ01AB1235', 'GJ01AB1236', 'GJ01AB1237', 'GJ01AB1239', 'GJ01AB1240', 'GJ01AB1242', 'GJ01AB1243'],
+                        datasets: [{
+                            label: 'Distance (km)',
+                            data: [2450, 1820, 1250, 2100, 1950, 1650, 2200, 2350],
+                            backgroundColor: 'rgba(26, 115, 232, 0.7)',
+                            borderColor: 'rgba(26, 115, 232, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Trip Duration Analysis Chart
+            const durationCtx = document.getElementById('durationChart');
+            if (durationCtx) {
+                new Chart(durationCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Trip 1', 'Trip 2', 'Trip 3', 'Trip 4', 'Trip 5', 'Trip 6', 'Trip 7'],
+                        datasets: [{
+                            label: 'Duration (hours)',
+                            data: [32.5, 28.75, 28.75, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(52, 168, 83, 0.2)',
+                            borderColor: 'rgba(52, 168, 83, 1)',
+                            borderWidth: 2,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function initializeCharts() {
+            // Monthly Cost Analysis Chart
+            const costAnalysisCtx = document.getElementById('costAnalysisChart');
+            if (costAnalysisCtx) {
+                new Chart(costAnalysisCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [
+                            {
+                                label: 'Diesel Cost',
+                                data: [3800, 4200, 3900, 4100, 4300, 4250],
+                                backgroundColor: 'rgba(26, 115, 232, 0.7)',
+                                borderColor: 'rgba(26, 115, 232, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Maintenance Cost',
+                                data: [15000, 8000, 22000, 5000, 12000, 32000],
+                                backgroundColor: 'rgba(234, 67, 53, 0.7)',
+                                borderColor: 'rgba(234, 67, 53, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Truck Performance Comparison Chart
+            const performanceCtx = document.getElementById('performanceChart');
+            if (performanceCtx) {
+                new Chart(performanceCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Fuel Efficiency', 'On-Time Delivery', 'Maintenance', 'Distance Covered', 'Load Capacity'],
+                        datasets: [
+                            {
+                                label: 'GJ01AB1234',
+                                data: [85, 90, 70, 80, 85],
+                                backgroundColor: 'rgba(26, 115, 232, 0.2)',
+                                borderColor: 'rgba(26, 115, 232, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(26, 115, 232, 1)'
+                            },
+                            {
+                                label: 'GJ01AB1235',
+                                data: [90, 85, 85, 75, 90],
+                                backgroundColor: 'rgba(52, 168, 83, 0.2)',
+                                borderColor: 'rgba(52, 168, 83, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(52, 168, 83, 1)'
+                            },
+                            {
+                                label: 'GJ01AB1237',
+                                data: [80, 95, 90, 85, 80],
+                                backgroundColor: 'rgba(251, 188, 4, 0.2)',
+                                borderColor: 'rgba(251, 188, 4, 1)',
+                                borderWidth: 2,
+                                pointBackgroundColor: 'rgba(251, 188, 4, 1)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
